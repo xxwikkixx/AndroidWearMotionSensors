@@ -9,6 +9,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.FloatMath;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +17,15 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class SensorFragment extends Fragment implements SensorEventListener {
+
+    private static final String TAG = "SensorFragment";
 
     private static final float SHAKE_THRESHOLD = 1.1f;
     private static final int SHAKE_WAIT_TIME_MS = 250;
@@ -29,12 +34,16 @@ public class SensorFragment extends Fragment implements SensorEventListener {
 
     private View mView;
     private TextView mTextTitle;
+    private String values;
     private TextView mTextValues;
+    private FileWriter input;
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private int mSensorType;
     private long mShakeTime = 0;
     private long mRotationTime = 0;
+    private File directory;
+
 
     Button butRecord;
 
@@ -86,6 +95,13 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     @Override
     public void onPause() {
         super.onPause();
+        try{
+            if(input!=null){
+                input.close();
+            }
+        } catch(IOException e){
+            Log.d(TAG, e.toString());
+        }
         mSensorManager.unregisterListener(this);
     }
 
@@ -97,36 +113,39 @@ public class SensorFragment extends Fragment implements SensorEventListener {
             return;
         }
 
-        mTextValues.setText(
-                        "x = " + Float.toString(event.values[0]) + "\n" +
-                        "y = " + Float.toString(event.values[1]) + "\n" +
-                        "z = " + Float.toString(event.values[2]) + "\n"
-        );
+        values= "x = " + Float.toString(event.values[0]) + "\n" +
+                "y = " + Float.toString(event.values[1]) + "\n" +
+                "z = " + Float.toString(event.values[2]) + "\n";
+
+        //mTextValues.setText(
+
+       // );
 
         if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             detectShake(event);
-            writeFile();
+            writeFile(values);
         }
         else if(event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             detectRotation(event);
         }
     }
 
-    public void writeFile( ){
+    public void writeFile(String toWrite){
         //String time, String azimuth, String pitch, String roll, String xData, String yData, String zData
-        File directory = new File("/sdcard/");
+        if(directory==null){
+           directory = new File("/sdcard/");
+        }
         File file = new File(directory, "XYZ.csv");
         String line = "t4est";
                 //time + ", " + azimuth + ", " + pitch + ", " + roll + ", " + xData + ", " + yData + ", " + zData;
 
-        try {
-            FileOutputStream stream =  new FileOutputStream(file);
-            mTextTitle.append(line);
-            stream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        try{
+           if(input==null){
+               input = new FileWriter(file, true);
+           }
+            input.write(toWrite);
+        }catch (IOException e){
+            Log.d(TAG, e.toString());
         }
     }
 
