@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:text="Record"
         android:id="@+id/butRec"
-        android:layout_centerVertical="true"
-        android:layout_alignEnd="@+id/text_title" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/text_values"
+        android:layout_marginBottom="9dp" />
 </RelativeLayout>

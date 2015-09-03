@@ -18,6 +18,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class SensorFragment extends Fragment implements SensorEventListener {
 
@@ -97,29 +98,36 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         }
 
         mTextValues.setText(
-                "x = " + Float.toString(event.values[0]) + "\n" +
+                        "x = " + Float.toString(event.values[0]) + "\n" +
                         "y = " + Float.toString(event.values[1]) + "\n" +
                         "z = " + Float.toString(event.values[2]) + "\n"
         );
 
         if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             detectShake(event);
+            writeFile();
         }
         else if(event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             detectRotation(event);
         }
     }
 
-    public void writeFile(String time, String azimuth, String pitch, String roll, String xData, String yData, String zData ){
+    public void writeFile( ){
+        //String time, String azimuth, String pitch, String roll, String xData, String yData, String zData
         File directory = new File("/sdcard/");
-        File file = new File(directory, "data.txt");
+        File file = new File(directory, "XYZ.csv");
+        String line = "t4est";
+                //time + ", " + azimuth + ", " + pitch + ", " + roll + ", " + xData + ", " + yData + ", " + zData;
+
         try {
             FileOutputStream stream =  new FileOutputStream(file);
+            mTextTitle.append(line);
+            stream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-
     }
 
     @Override
