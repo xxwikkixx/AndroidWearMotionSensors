@@ -18,6 +18,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class SensorFragment extends Fragment implements SensorEventListener {
@@ -35,6 +36,8 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private int mSensorType;
     private long mShakeTime = 0;
     private long mRotationTime = 0;
+
+    String X, Y, Z;
 
     Button butRecord;
 
@@ -74,6 +77,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         //record button for data recording
         butRecord = (Button) mView.findViewById(R.id.butRec);
 
+
         return mView;
     }
 
@@ -102,17 +106,31 @@ public class SensorFragment extends Fragment implements SensorEventListener {
                         "y = " + Float.toString(event.values[1]) + "\n" +
                         "z = " + Float.toString(event.values[2]) + "\n"
         );
+        X = Float.toString(event.values[0]);
+        Y = Float.toString(event.values[1]);
+        Z = Float.toString(event.values[2]);
+
+        butRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new Thread(new Runnable() {
+                    public void run() {
+                        writeFile(X, Y, Z);
+                    }
+                }).start();
+            }
+        });
+
 
         if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             detectShake(event);
-            writeFile();
         }
         else if(event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             detectRotation(event);
         }
     }
 
-    public void writeFile( ){
+    public void writeFile(String X, String Y, String Z ){
         //String time, String azimuth, String pitch, String roll, String xData, String yData, String zData
         File directory = new File("/sdcard/");
         File file = new File(directory, "XYZ.csv");
@@ -120,9 +138,9 @@ public class SensorFragment extends Fragment implements SensorEventListener {
                 //time + ", " + azimuth + ", " + pitch + ", " + roll + ", " + xData + ", " + yData + ", " + zData;
 
         try {
-            FileOutputStream stream =  new FileOutputStream(file);
-            mTextTitle.append(line);
-            stream.close();
+            FileWriter stream =  new FileWriter(file, true);
+            stream.write(X +","+ Y +","+ Z);
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -145,9 +163,9 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         if((now - mShakeTime) > SHAKE_WAIT_TIME_MS) {
             mShakeTime = now;
             //acclerometer
-            float gX = event.values[0] / SensorManager.GRAVITY_EARTH;
-            float gY = event.values[1] / SensorManager.GRAVITY_EARTH;
-            float gZ = event.values[2] / SensorManager.GRAVITY_EARTH;
+            float gX = event.values[0];
+            float gY = event.values[1];
+            float gZ = event.values[2];
 
             // gForce will be close to 1 when there is no movement
             float gForce = FloatMath.sqrt(gX*gX + gY*gY + gZ*gZ);
