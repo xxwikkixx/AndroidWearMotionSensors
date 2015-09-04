@@ -122,7 +122,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         values= "x = " + Float.toString(event.values[0]) + ", " + "y = " + Float.toString(event.values[1]) + ", " + "z = " + Float.toString(event.values[2]) + "\n";
         values2 = "azimuth" + Float.toString(event.values[0]) + "pitch = " + Float.toString(event.values[1]) + ", " + "roll = " + Float.toString(event.values[2]) + "\n";
         mTextValues.setText(
-        currentTime + "," + Float.toString(event.values[0]) + ", " + Float.toString(event.values[1]) + ", " +  Float.toString(event.values[2]) + "\n"
+        currentTime + Float.toString(event.values[0]) + ", " + "y = " + Float.toString(event.values[1]) + ", " + "z = " + Float.toString(event.values[2]) + "\n"
        );
 
         if(event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
