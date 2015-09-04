@@ -34,7 +34,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
 
     private View mView;
     private TextView mTextTitle;
-    private String values;
+    private String values, values2;
     private TextView mTextValues;
     private FileWriter input;
     private SensorManager mSensorManager;
@@ -113,20 +113,19 @@ public class SensorFragment extends Fragment implements SensorEventListener {
             return;
         }
 
-        values= "x = " + Float.toString(event.values[0]) + "\n" +
-                "y = " + Float.toString(event.values[1]) + "\n" +
-                "z = " + Float.toString(event.values[2]) + "\n";
+        values= "x = " + Float.toString(event.values[0]) + ", " + "y = " + Float.toString(event.values[1]) + ", " + "z = " + Float.toString(event.values[2]) + "\n";
+        values2 = "azimuth" + Float.toString(event.values[0]) + "pitch = " + Float.toString(event.values[1]) + ", " + "roll = " + Float.toString(event.values[2]) + "\n";
+        mTextValues.setText(
+        "x = " + Float.toString(event.values[0]) + ", " + "y = " + Float.toString(event.values[1]) + ", " + "z = " + Float.toString(event.values[2]) + "\n"
+       );
 
-        //mTextValues.setText(
-
-       // );
-
-        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        if(event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
             detectShake(event);
             writeFile(values);
         }
         else if(event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
             detectRotation(event);
+            writeFile(values);
         }
     }
 
