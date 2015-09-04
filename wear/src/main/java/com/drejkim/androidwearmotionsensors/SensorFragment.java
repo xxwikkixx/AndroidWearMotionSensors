@@ -22,6 +22,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class SensorFragment extends Fragment implements SensorEventListener {
 
@@ -43,6 +45,10 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private long mShakeTime = 0;
     private long mRotationTime = 0;
     private File directory;
+
+    private String currentTime;
+    Calendar calTime = Calendar.getInstance();
+    private SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss");
 
 
     Button butRecord;
@@ -112,11 +118,11 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         {
             return;
         }
-
+        currentTime = time.format(calTime.getTime());
         values= "x = " + Float.toString(event.values[0]) + ", " + "y = " + Float.toString(event.values[1]) + ", " + "z = " + Float.toString(event.values[2]) + "\n";
         values2 = "azimuth" + Float.toString(event.values[0]) + "pitch = " + Float.toString(event.values[1]) + ", " + "roll = " + Float.toString(event.values[2]) + "\n";
         mTextValues.setText(
-        "x = " + Float.toString(event.values[0]) + ", " + "y = " + Float.toString(event.values[1]) + ", " + "z = " + Float.toString(event.values[2]) + "\n"
+        currentTime + "," + Float.toString(event.values[0]) + ", " + Float.toString(event.values[1]) + ", " +  Float.toString(event.values[2]) + "\n"
        );
 
         if(event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
