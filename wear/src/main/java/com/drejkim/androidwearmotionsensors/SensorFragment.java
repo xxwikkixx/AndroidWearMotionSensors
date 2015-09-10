@@ -42,13 +42,20 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private int mSensorType;
+
+    float[] rotationMatrix = null;
+    float[] mAccelerometerValues = null;
+    float orientation[] = new float[3];
+
     private long mShakeTime = 0;
     private long mRotationTime = 0;
     private File directory;
 
     private String currentTime;
+    private String fileName;
     Calendar calTime = Calendar.getInstance();
     private SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss");
+    private SimpleDateFormat date = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
 
 
     Button butRecord;
@@ -119,35 +126,37 @@ public class SensorFragment extends Fragment implements SensorEventListener {
             return;
         }
         currentTime = time.format(calTime.getTime());
-        values= "x = " + Float.toString(event.values[0]) + ", " + "y = " + Float.toString(event.values[1]) + ", " + "z = " + Float.toString(event.values[2]) + "\n";
-        values2 = "azimuth" + Float.toString(event.values[0]) + "pitch = " + Float.toString(event.values[1]) + ", " + "roll = " + Float.toString(event.values[2]) + "\n";
-        mTextValues.setText(
-        currentTime + Float.toString(event.values[0]) + ", " + "y = " + Float.toString(event.values[1]) + ", " + "z = " + Float.toString(event.values[2]) + "\n"
-       );
+        fileName = date.format(calTime.getTime()) + ".csv";
 
-        if(event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
-            detectShake(event);
-            writeFile(values);
+        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+            mAccelerometerValues = event.values;
+        if(event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            rotationMatrix = new float[16];
+            SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
+            SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Z, rotationMatrix);
+            SensorManager.getOrientation(rotationMatrix, orientation);
         }
-        else if(event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            detectRotation(event);
-            writeFile(values);
-        }
+        values=  currentTime + "," + Float.toString(mAccelerometerValues[0]) + ", " + Float.toString(mAccelerometerValues[1]) + ", " + Float.toString(mAccelerometerValues[2]) + "," +
+                Float.toString(orientation[0]) + "," + Float.toString(orientation[1]) + ", " +  Float.toString(orientation[2]) + "\n";
+        writeFile(values);
+        mTextValues.setText(
+                currentTime + Float.toString(event.values[0]) + ", " + "y = " + Float.toString(event.values[1]) + ", " + "z = " + Float.toString(event.values[2]) + "\n"
+        );
     }
 
     public void writeFile(String toWrite){
         //String time, String azimuth, String pitch, String roll, String xData, String yData, String zData
         if(directory==null){
-           directory = new File("/sdcard/");
+            directory = new File("/sdcard/");
         }
-        File file = new File(directory, "XYZ.csv");
+        File file = new File(directory, fileName);
         String line = "t4est";
-                //time + ", " + azimuth + ", " + pitch + ", " + roll + ", " + xData + ", " + yData + ", " + zData;
+        //time + ", " + azimuth + ", " + pitch + ", " + roll + ", " + xData + ", " + yData + ", " + zData;
 
         try{
-           if(input==null){
-               input = new FileWriter(file, true);
-           }
+            if(input==null){
+                input = new FileWriter(file, true);
+            }
             input.write(toWrite);
         }catch (IOException e){
             Log.d(TAG, e.toString());
