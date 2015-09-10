@@ -58,6 +58,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private SimpleDateFormat date = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
 
 
+
     Button butRecord;
 
     public static SensorFragment newInstance(int sensorType) {
@@ -81,6 +82,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
 
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(mSensorType);
+        fileName = date.format(calTime.getTime()) + ".csv";
     }
 
     @Override
@@ -126,7 +128,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
             return;
         }
         currentTime = time.format(calTime.getTime());
-        fileName = date.format(calTime.getTime()) + ".csv";
+
 
         if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
             mAccelerometerValues = event.values;
@@ -136,12 +138,14 @@ public class SensorFragment extends Fragment implements SensorEventListener {
             SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Z, rotationMatrix);
             SensorManager.getOrientation(rotationMatrix, orientation);
         }
-        values=  currentTime + "," + Float.toString(mAccelerometerValues[0]) + ", " + Float.toString(mAccelerometerValues[1]) + ", " + Float.toString(mAccelerometerValues[2]) + "," +
-                Float.toString(orientation[0]) + "," + Float.toString(orientation[1]) + ", " +  Float.toString(orientation[2]) + "\n";
-        writeFile(values);
-        mTextValues.setText(
-                currentTime + Float.toString(event.values[0]) + ", " + "y = " + Float.toString(event.values[1]) + ", " + "z = " + Float.toString(event.values[2]) + "\n"
-        );
+        if(mAccelerometerValues!=null && rotationMatrix!= null) {
+            values = currentTime + "," + Float.toString(mAccelerometerValues[0]) + ", " + Float.toString(mAccelerometerValues[1]) + ", " + Float.toString(mAccelerometerValues[2]) + "," +
+                    Float.toString(orientation[0]) + "," + Float.toString(orientation[1]) + ", " + Float.toString(orientation[2]) + "\n";
+            writeFile(values);
+            mTextValues.setText(
+                    currentTime + Float.toString(event.values[0]) + ", " + "y = " + Float.toString(event.values[1]) + ", " + "z = " + Float.toString(event.values[2]) + "\n"
+            );
+        }
     }
 
     public void writeFile(String toWrite){
