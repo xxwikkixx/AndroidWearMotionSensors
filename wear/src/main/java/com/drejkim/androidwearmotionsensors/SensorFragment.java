@@ -52,11 +52,11 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private File directory;
 
     private String currentTime;
-    private String fileName;
+
     Calendar calTime = Calendar.getInstance();
     private SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss");
     private SimpleDateFormat date = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
-
+    private final String fileName = date.format(calTime.getTime()) + ".csv";
 
 
     Button butRecord;
@@ -82,7 +82,6 @@ public class SensorFragment extends Fragment implements SensorEventListener {
 
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(mSensorType);
-        fileName = date.format(calTime.getTime()) + ".csv";
     }
 
     @Override
@@ -130,15 +129,17 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         currentTime = time.format(calTime.getTime());
 
 
-        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             mAccelerometerValues = event.values;
+        }
         if(event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
             rotationMatrix = new float[16];
             SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
             SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Z, rotationMatrix);
             SensorManager.getOrientation(rotationMatrix, orientation);
         }
-        if(mAccelerometerValues!=null && rotationMatrix!= null) {
+        //TODO: Currently does no write azimuth roll and pitch
+        if(mAccelerometerValues!=null || rotationMatrix!= null) {
             values = currentTime + "," + Float.toString(mAccelerometerValues[0]) + ", " + Float.toString(mAccelerometerValues[1]) + ", " + Float.toString(mAccelerometerValues[2]) + "," +
                     Float.toString(orientation[0]) + "," + Float.toString(orientation[1]) + ", " + Float.toString(orientation[2]) + "\n";
             writeFile(values);
@@ -153,8 +154,9 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         if(directory==null){
             directory = new File("/sdcard/");
         }
-        File file = new File(directory, fileName);
-        String line = "t4est";
+        //Commenting out because its easier to adb pull XYZ.csv
+        //File file = new File(directory, fileName);
+        File file = new File(directory, "XYZ.csv");
         //time + ", " + azimuth + ", " + pitch + ", " + roll + ", " + xData + ", " + yData + ", " + zData;
 
         try{
