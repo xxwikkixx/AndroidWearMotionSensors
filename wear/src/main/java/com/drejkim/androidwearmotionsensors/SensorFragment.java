@@ -66,6 +66,8 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private final String fileName = date.format(calTime.getTime()) + ".csv";
 
 
+    String X, Y, Z;
+
     Button butRecord;
 
     public static SensorFragment newInstance(int sensorType) {
@@ -103,6 +105,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
 
         //record button for data recording
         butRecord = (Button) mView.findViewById(R.id.butRec);
+
 
         return mView;
     }
@@ -151,7 +154,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
             writeFile(values);
         }
     }
-
+    
     public void writeFile(String toWrite){
         if(bufferedWriter == null){
             try {
@@ -184,9 +187,9 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         if((now - mShakeTime) > SHAKE_WAIT_TIME_MS) {
             mShakeTime = now;
             //acclerometer
-            float gX = event.values[0] / SensorManager.GRAVITY_EARTH;
-            float gY = event.values[1] / SensorManager.GRAVITY_EARTH;
-            float gZ = event.values[2] / SensorManager.GRAVITY_EARTH;
+            float gX = event.values[0];
+            float gY = event.values[1];
+            float gZ = event.values[2];
 
             // gForce will be close to 1 when there is no movement
             float gForce = FloatMath.sqrt(gX*gX + gY*gY + gZ*gZ);
