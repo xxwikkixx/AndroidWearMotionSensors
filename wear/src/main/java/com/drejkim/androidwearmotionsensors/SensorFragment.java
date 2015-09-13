@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,6 +35,10 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private static final float ROTATION_THRESHOLD = 2.0f;
     private static final int ROTATION_WAIT_TIME_MS = 100;
 
+    private Sensor sensorAccelerometer = null;
+    private Sensor sensorMagnetic = null;
+    private Sensor sensorGeoRotationVector = null;
+
     private View mView;
     private TextView mTextTitle;
     private String values, values2;
@@ -42,7 +47,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private int mSensorType;
-
+    private int lineNumber = 0;
     float[] rotationMatrix = null;
     float[] mAccelerometerValues = null;
     float orientation[] = new float[3];
@@ -50,6 +55,8 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private long mShakeTime = 0;
     private long mRotationTime = 0;
     private File directory;
+    private File file;
+    private BufferedWriter bufferedWriter;
 
     private String currentTime;
 
@@ -79,9 +86,9 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         if(args != null) {
             mSensorType = args.getInt("sensorType");
         }
-
-        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-        mSensor = mSensorManager.getDefaultSensor(mSensorType);
+        directory = new File("/sdcard/");
+        file = new File(directory, "XYZ.csv");
+        prepareSensors();
     }
 
     @Override
@@ -91,7 +98,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         mView = inflater.inflate(R.layout.sensor, container, false);
 
         mTextTitle = (TextView) mView.findViewById(R.id.text_title);
-        mTextTitle.setText(mSensor.getStringType());
+        //mTextTitle.setText(mSensor.getStringType());
         mTextValues = (TextView) mView.findViewById(R.id.text_values);
 
         //record button for data recording
@@ -128,7 +135,6 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         }
         currentTime = time.format(calTime.getTime());
 
-
         if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             mAccelerometerValues = event.values;
         }
@@ -138,40 +144,34 @@ public class SensorFragment extends Fragment implements SensorEventListener {
             SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Z, rotationMatrix);
             SensorManager.getOrientation(rotationMatrix, orientation);
         }
-        //TODO: Currently does no write azimuth roll and pitch
-        if(mAccelerometerValues!=null || rotationMatrix!= null) {
-            values = currentTime + "," + Float.toString(mAccelerometerValues[0]) + ", " + Float.toString(mAccelerometerValues[1]) + ", " + Float.toString(mAccelerometerValues[2]) + "," +
-                    Float.toString(orientation[0]) + "," + Float.toString(orientation[1]) + ", " + Float.toString(orientation[2]) + "\n";
+        if(mAccelerometerValues!=null && rotationMatrix!= null) {
+            values = time.format(calTime.getTime()) + "," + lineNumber + "," + Float.toString(orientation[0]) + "," + Float.toString(orientation[1]) + ", " + Float.toString(orientation[2])  + Float.toString(mAccelerometerValues[0]) + ", "
+                    + Float.toString(mAccelerometerValues[1]) + ", " + Float.toString(mAccelerometerValues[2]) +"\n";
+            lineNumber++;
             writeFile(values);
-            mTextValues.setText(
-                    currentTime + Float.toString(event.values[0]) + ", " + "y = " + Float.toString(event.values[1]) + ", " + "z = " + Float.toString(event.values[2]) + "\n"
-            );
         }
     }
 
     public void writeFile(String toWrite){
-        //String time, String azimuth, String pitch, String roll, String xData, String yData, String zData
-        if(directory==null){
-            directory = new File("/sdcard/");
+        if(bufferedWriter == null){
+            try {
+                bufferedWriter = new BufferedWriter(new FileWriter(file, true));
+            }catch(java.io.IOException e){
+                Log.d(TAG, e.toString());
+            }
         }
         //Commenting out because its easier to adb pull XYZ.csv
         //File file = new File(directory, fileName);
-        File file = new File(directory, "XYZ.csv");
-        //time + ", " + azimuth + ", " + pitch + ", " + roll + ", " + xData + ", " + yData + ", " + zData;
-
-        try{
-            if(input==null){
-                input = new FileWriter(file, true);
-            }
-            input.write(toWrite);
-        }catch (IOException e){
+        try {
+            bufferedWriter.write(toWrite);
+        }catch(IOException e){
             Log.d(TAG, e.toString());
         }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        //What is this?
     }
 
 
@@ -221,5 +221,19 @@ public class SensorFragment extends Fragment implements SensorEventListener {
                 mView.setBackgroundColor(Color.BLACK);
             }
         }
+    }
+
+
+    private void prepareSensors() {
+        //Register the sensorManager and both the accelerometer and magnetic sensor.
+        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        //sensorMagnetic = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        sensorGeoRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+
+        //Register listeners.
+        mSensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+        //sensorManager.registerListener(this, sensorMagnetic, SensorManager.SENSOR_DELAY_FASTEST);
+        mSensorManager.registerListener(this, sensorGeoRotationVector, SensorManager.SENSOR_DELAY_FASTEST);
     }
 }
