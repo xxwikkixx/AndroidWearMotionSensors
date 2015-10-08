@@ -65,7 +65,8 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss");
     private SimpleDateFormat date = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
     private final String fileName = date.format(calTime.getTime()) + ".csv";
-    
+
+    int count = 0;
 
     Button butRecord;
 
@@ -148,7 +149,11 @@ public class SensorFragment extends Fragment implements SensorEventListener {
             values = currentTime + "," + lineNumber + "," + Float.toString(orientation[0]) + "," + Float.toString(orientation[1]) + ", " + Float.toString(orientation[2]) +","+ Float.toString(mAccelerometerValues[0]) + ", "
                     + Float.toString(mAccelerometerValues[1]) + ", " + Float.toString(mAccelerometerValues[2]) + "\n";
             lineNumber++;
-            writeFile(values);
+            if(count ==10) {
+                writeFile(values);
+                count = 0;
+            }
+            count++;
         }
 
     }
