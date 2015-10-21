@@ -192,8 +192,8 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         sensorGeoRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
         //Register listeners.
-        mSensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-        mSensorManager.registerListener(this, sensorGeoRotationVector, SensorManager.SENSOR_DELAY_FASTEST);
+        mSensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this, sensorGeoRotationVector, SensorManager.SENSOR_DELAY_UI);
         butRecord.setText(R.string.stop);
     }
     private void destroySensors(){
