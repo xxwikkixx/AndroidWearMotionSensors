@@ -1,32 +1,28 @@
 package com.drejkim.androidwearmotionsensors;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.util.FloatMath;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class SensorFragment extends Fragment implements SensorEventListener {
 
@@ -37,20 +33,16 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private static final float ROTATION_THRESHOLD = 2.0f;
     private static final int ROTATION_WAIT_TIME_MS = 100;
 
-    private static Sensor sensorAccelerometer = null;
-    private Sensor sensorMagnetic = null;
-    private static Sensor sensorGeoRotationVector = null;
+    String values;
+    Sensor sensorAccelerometer = null;
+    Sensor sensorGeoRotationVector = null;
+    Sensor mSensor;
 
     private View mView;
     private TextView mTextTitle;
-    private String values, values2;
-    private TextView mTextValues;
     private FileWriter input;
-    private static SensorManager mSensorManager;
-    private Sensor mSensor;
-    private int mSensorType;
+    private SensorManager mSensorManager;
     private int lineNumber = 0;
-    private int writeNumber=0;
     float[] rotationMatrix = null;
     float[] mAccelerometerValues = null;
     float orientation[] = new float[3];
@@ -64,8 +56,8 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private String currentTime;
 
     Calendar calTime = Calendar.getInstance();
-    private SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss");
-    private SimpleDateFormat date = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+    private SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss", Locale.US);
+    private SimpleDateFormat date = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss", Locale.US);
     private final String fileName = date.format(calTime.getTime()) + ".csv";
 
     int count = 0;
@@ -87,11 +79,19 @@ public class SensorFragment extends Fragment implements SensorEventListener {
 
 
         Bundle args = getArguments();
-        if(args != null) {
-            mSensorType = args.getInt("sensorType");
-        }
+        butRecord = (ToggleButton)mView.findViewById(R.id.butRec);
+        butRecord.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    prepareSensors();
+                } else {
+                    destroySensors();
+                }
+            }
+        });
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-        directory = new File("/sdcard/");
+        directory = new File(Environment.getExternalStorageDirectory().getPath());
         file = new File(directory, "XYZ.csv");
     }
 
@@ -103,8 +103,6 @@ public class SensorFragment extends Fragment implements SensorEventListener {
 
         mTextTitle = (TextView) mView.findViewById(R.id.text_title);
         //mTextTitle.setText(mSensor.getStringType());
-        mTextValues = (TextView) mView.findViewById(R.id.text_values);
-
         //record button for data recording
         butRecord = (ToggleButton) mView.findViewById(R.id.butRec);
 
@@ -188,25 +186,20 @@ public class SensorFragment extends Fragment implements SensorEventListener {
 
     }
 
-    public static void prepareSensors(Activity activity) {
-        //switch (view.getId()) {
-
-        //Register the sensorManager and both the accelerometer and magnetic sensor.
-        mSensorManager = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
+    private void prepareSensors() {
+        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        //sensorMagnetic = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         sensorGeoRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
         //Register listeners.
-        mSensorManager.registerListener(activity, sensorAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-        //sensorManager.registerListener(this, sensorMagnetic, SensorManager.SENSOR_DELAY_FASTEST);
+        mSensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
         mSensorManager.registerListener(this, sensorGeoRotationVector, SensorManager.SENSOR_DELAY_FASTEST);
-        //((ToggleButton) view).setText("Stop Recording");
-
-                //} else {
-               //     mSensorManager.unregisterListener(this);
-                    //((ToggleButton) view).setText("Press To Record");
-              //  }
-
+        butRecord.setText(R.string.stop);
+    }
+    private void destroySensors(){
+        if(mSensorManager!=null){
+            mSensorManager.unregisterListener(this);
+            butRecord.setText(R.string.start);
+        }
     }
 }

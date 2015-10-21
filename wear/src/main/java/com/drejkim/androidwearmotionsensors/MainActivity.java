@@ -33,14 +33,7 @@ public class MainActivity extends Activity  {
         start = (ToggleButton) findViewById(R.id.butRec);
         //stop = (Button) findViewById(R.id.buttonStop);
 
-        start.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    SensorFragment.prepareSensors(this);
-                }
-            }
-        });
+
         WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override

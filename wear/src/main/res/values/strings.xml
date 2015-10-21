@@ -4,5 +4,6 @@
     <string name="app_name">Android Wear Motion Sensors</string>
     <string name="init_title">Sensor type</string>
     <string name="init_values">Getting data...</string>
-
+    <string name="start">Press to Start</string>
+    <string name="stop">Stop Recording</string>
 </resources>
