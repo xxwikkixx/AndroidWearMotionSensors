@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override public void onLayoutInflated(WatchViewStub stub) {
                 final GridViewPager pager = (GridViewPager) findViewById(R.id.pager);
-                pager.setAdapter(new SensorFragmentPagerAdapter(getFragmentManager()));
+                //pager.setAdapter(new SensorFragmentPagerAdapter(getFragmentManager()));
 
                 DotsPageIndicator indicator = (DotsPageIndicator) findViewById(R.id.page_indicator);
                 indicator.setPager(pager);

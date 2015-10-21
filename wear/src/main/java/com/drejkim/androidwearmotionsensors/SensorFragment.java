@@ -2,6 +2,7 @@ package com.drejkim.androidwearmotionsensors;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -27,7 +28,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class SensorFragment extends Fragment implements SensorEventListener {
+public class SensorFragment extends Fragment implements SensorEventListener{
 
     private static final String TAG = "SensorFragment";
 
@@ -45,7 +46,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private String values, values2;
     private TextView mTextValues;
     private FileWriter input;
-    private SensorManager mSensorManager =(SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+    private SensorManager mSensorManager;
     private Sensor mSensor;
     private int mSensorType;
     private int lineNumber = 0;
@@ -71,7 +72,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
 
     ToggleButton butRecord;
 
-    public static SensorFragment newInstance(int sensorType) {
+    /*public static SensorFragment newInstance(int sensorType) {
         SensorFragment f = new SensorFragment();
 
         // Supply sensorType as an argument
@@ -79,7 +80,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         args.putInt("sensorType", sensorType);
         f.setArguments(args);
         return f;
-    }
+    }*/
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +105,18 @@ public class SensorFragment extends Fragment implements SensorEventListener {
 
         //record button for data recording
         butRecord = (ToggleButton) mView.findViewById(R.id.butRec);
+
+        butRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (butRecord.isChecked()) {
+                    prepareSensors();
+                } else
+                    mSensorManager.unregisterListener((SensorEventListener) mSensorManager);
+
+            }
+        });
+
 
 
         return mView;
@@ -185,29 +198,20 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         //What is this?
     }
 
-    private void prepareSensors(View view) {
-        switch (view.getId()) {
 
-            case R.id.butRec:
-                boolean on = ((ToggleButton) view).isChecked();
+    private void prepareSensors() {
 
-                if (on) {
-                    //Register the sensorManager and both the accelerometer and magnetic sensor.
-                    mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-                    sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-                    //sensorMagnetic = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-                    sensorGeoRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        //Register the sensorManager and both the accelerometer and magnetic sensor.
+        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        //sensorMagnetic = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        sensorGeoRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
-                    //Register listeners.
-                    mSensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-                    //sensorManager.registerListener(this, sensorMagnetic, SensorManager.SENSOR_DELAY_FASTEST);
-                    mSensorManager.registerListener(this, sensorGeoRotationVector, SensorManager.SENSOR_DELAY_FASTEST);
-                    //((ToggleButton) view).setText("Stop Recording");
+        //Register listeners.
+        mSensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+        //sensorManager.registerListener(this, sensorMagnetic, SensorManager.SENSOR_DELAY_FASTEST);
+        mSensorManager.registerListener(this, sensorGeoRotationVector, SensorManager.SENSOR_DELAY_FASTEST);
 
-                } else {
-                    mSensorManager.unregisterListener(this);
-                    //((ToggleButton) view).setText("Press To Record");
-                }
-        }
+
     }
 }

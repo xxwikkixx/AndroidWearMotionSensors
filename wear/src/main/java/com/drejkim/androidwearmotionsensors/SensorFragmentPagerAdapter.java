@@ -1,4 +1,4 @@
-package com.drejkim.androidwearmotionsensors;
+/*package com.drejkim.androidwearmotionsensors;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -16,7 +16,7 @@ public class SensorFragmentPagerAdapter extends FragmentGridPagerAdapter {
         super(fm);
     }
 
-    @Override
+
     public Fragment getFragment(int row, int column) {
         return SensorFragment.newInstance(sensorTypes[column]);
     }
@@ -30,4 +30,4 @@ public class SensorFragmentPagerAdapter extends FragmentGridPagerAdapter {
     public int getColumnCount(int row) {
         return sensorTypes.length;
     }
-}
+}*/
