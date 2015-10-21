@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -44,7 +45,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private String values, values2;
     private TextView mTextValues;
     private FileWriter input;
-    private SensorManager mSensorManager;
+    private SensorManager mSensorManager =(SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
     private Sensor mSensor;
     private int mSensorType;
     private int lineNumber = 0;
@@ -68,7 +69,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
 
     int count = 0;
 
-    Button butRecord;
+    ToggleButton butRecord;
 
     public static SensorFragment newInstance(int sensorType) {
         SensorFragment f = new SensorFragment();
@@ -89,7 +90,6 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         }
         directory = new File("/sdcard/");
         file = new File(directory, "XYZ.csv");
-        prepareSensors();
     }
 
     @Override
@@ -103,7 +103,7 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         mTextValues = (TextView) mView.findViewById(R.id.text_values);
 
         //record button for data recording
-        butRecord = (Button) mView.findViewById(R.id.butRec);
+        butRecord = (ToggleButton) mView.findViewById(R.id.butRec);
 
 
         return mView;
@@ -185,16 +185,29 @@ public class SensorFragment extends Fragment implements SensorEventListener {
         //What is this?
     }
 
-    private void prepareSensors() {
-        //Register the sensorManager and both the accelerometer and magnetic sensor.
-        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-        sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        //sensorMagnetic = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        sensorGeoRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+    private void prepareSensors(View view) {
+        switch (view.getId()) {
 
-        //Register listeners.
-        mSensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-        //sensorManager.registerListener(this, sensorMagnetic, SensorManager.SENSOR_DELAY_FASTEST);
-        mSensorManager.registerListener(this, sensorGeoRotationVector, SensorManager.SENSOR_DELAY_FASTEST);
+            case R.id.butRec:
+                boolean on = ((ToggleButton) view).isChecked();
+
+                if (on) {
+                    //Register the sensorManager and both the accelerometer and magnetic sensor.
+                    mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+                    sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+                    //sensorMagnetic = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+                    sensorGeoRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+
+                    //Register listeners.
+                    mSensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+                    //sensorManager.registerListener(this, sensorMagnetic, SensorManager.SENSOR_DELAY_FASTEST);
+                    mSensorManager.registerListener(this, sensorGeoRotationVector, SensorManager.SENSOR_DELAY_FASTEST);
+                    //((ToggleButton) view).setText("Stop Recording");
+
+                } else {
+                    mSensorManager.unregisterListener(this);
+                    //((ToggleButton) view).setText("Press To Record");
+                }
+        }
     }
 }
