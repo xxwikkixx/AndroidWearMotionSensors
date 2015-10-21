@@ -8,3 +8,4 @@
     app:rectLayout="@layout/rect_activity_wear"
     app:roundLayout="@layout/round_activity_wear"
     android:keepScreenOn="true" />
+

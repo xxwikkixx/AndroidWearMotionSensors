@@ -1,5 +1,6 @@
 package com.drejkim.androidwearmotionsensors;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Color;
@@ -36,16 +37,16 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     private static final float ROTATION_THRESHOLD = 2.0f;
     private static final int ROTATION_WAIT_TIME_MS = 100;
 
-    private Sensor sensorAccelerometer = null;
+    private static Sensor sensorAccelerometer = null;
     private Sensor sensorMagnetic = null;
-    private Sensor sensorGeoRotationVector = null;
+    private static Sensor sensorGeoRotationVector = null;
 
     private View mView;
     private TextView mTextTitle;
     private String values, values2;
     private TextView mTextValues;
     private FileWriter input;
-    private SensorManager mSensorManager =(SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+    private static SensorManager mSensorManager;
     private Sensor mSensor;
     private int mSensorType;
     private int lineNumber = 0;
@@ -84,10 +85,12 @@ public class SensorFragment extends Fragment implements SensorEventListener {
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         Bundle args = getArguments();
         if(args != null) {
             mSensorType = args.getInt("sensorType");
         }
+        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         directory = new File("/sdcard/");
         file = new File(directory, "XYZ.csv");
     }
@@ -182,32 +185,28 @@ public class SensorFragment extends Fragment implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        //What is this?
+
     }
 
-    private void prepareSensors(View view) {
-        switch (view.getId()) {
+    public static void prepareSensors(Activity activity) {
+        //switch (view.getId()) {
 
-            case R.id.butRec:
-                boolean on = ((ToggleButton) view).isChecked();
+        //Register the sensorManager and both the accelerometer and magnetic sensor.
+        mSensorManager = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
+        sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        //sensorMagnetic = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        sensorGeoRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
-                if (on) {
-                    //Register the sensorManager and both the accelerometer and magnetic sensor.
-                    mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-                    sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-                    //sensorMagnetic = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-                    sensorGeoRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        //Register listeners.
+        mSensorManager.registerListener(activity, sensorAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+        //sensorManager.registerListener(this, sensorMagnetic, SensorManager.SENSOR_DELAY_FASTEST);
+        mSensorManager.registerListener(this, sensorGeoRotationVector, SensorManager.SENSOR_DELAY_FASTEST);
+        //((ToggleButton) view).setText("Stop Recording");
 
-                    //Register listeners.
-                    mSensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-                    //sensorManager.registerListener(this, sensorMagnetic, SensorManager.SENSOR_DELAY_FASTEST);
-                    mSensorManager.registerListener(this, sensorGeoRotationVector, SensorManager.SENSOR_DELAY_FASTEST);
-                    //((ToggleButton) view).setText("Stop Recording");
-
-                } else {
-                    mSensorManager.unregisterListener(this);
+                //} else {
+               //     mSensorManager.unregisterListener(this);
                     //((ToggleButton) view).setText("Press To Record");
-                }
-        }
+              //  }
+
     }
 }
