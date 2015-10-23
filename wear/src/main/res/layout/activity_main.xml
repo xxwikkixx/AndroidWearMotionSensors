@@ -1,10 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.wearable.view.WatchViewStub
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/watch_view_stub"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:rectLayout="@layout/rect_activity_wear"
-    app:roundLayout="@layout/round_activity_wear"
-    android:keepScreenOn="true" />
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:id="@+id/watch_view_stub"
+app:rectLayout="@layout/rect_activity_wear"
+app:roundLayout="@layout/round_activity_wear"
+
+android:keepScreenOn="true"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:gravity="center"
+android:background="@color/black">
+
+<TextView android:id="@+id/text_title"
+    android:layout_width="100dp"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:text="@string/init_title" />
+
+<TextView android:id="@+id/text_values"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:layout_below="@id/text_title"
+    android:text="@string/init_values" />
+
+<ToggleButton
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textOn="Stop"
+    android:textOff="Record"
+    android:checked="false"
+    android:id="@+id/butRec"
+    android:layout_alignParentBottom="true"
+    android:layout_alignStart="@+id/text_values"
+    android:layout_marginBottom="9dp" />
+</RelativeLayout>
+
