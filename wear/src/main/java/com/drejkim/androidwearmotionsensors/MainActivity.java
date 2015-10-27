@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Locale;
 
 public class MainActivity extends Activity implements SensorEventListener {
@@ -53,6 +55,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     float[] rotationMatrix = null;
     float[] mAccelerometerValues = null;
     float orientation[] = new float[3];
+    String csv[];
 
     private long mShakeTime = 0;
     private long mRotationTime = 0;
@@ -95,6 +98,16 @@ public class MainActivity extends Activity implements SensorEventListener {
                     };
                     thread.start();
                     destroySensors();
+                    TextView textView = (TextView) findViewById(R.id.text_values);
+                    textView.setText("Writing to file...");
+                    ListIterator<String> it = allValues.listIterator();
+                    int num = 0;
+                    while(it.hasNext()){
+                        if(num%10==0)
+                            writeFile(it.next());
+                        num++;
+                    }
+                    textView.setText("Done writing");
                 }
             }
         });
@@ -121,17 +134,20 @@ public class MainActivity extends Activity implements SensorEventListener {
             SensorManager.getOrientation(rotationMatrix, orientation);
         }
         if (mAccelerometerValues != null && rotationMatrix != null) {
-            values = currentTime + ","
-                    + lineNumber + ","
-                    + Float.toString(orientation[0]) + ","
-                    + Float.toString(orientation[1]) + ", "
-                    + Float.toString(orientation[2]) + ","
-                    + Float.toString(mAccelerometerValues[0]) + ", "
-                    + Float.toString(mAccelerometerValues[1]) + ", "
-                    + Float.toString(mAccelerometerValues[2]) + "\n";
-            allValues.add(values);
+            if(lineNumber%10==0){
+                values = currentTime + ","
+                        + lineNumber + ","
+                        + Float.toString(orientation[0]) + ","
+                        + Float.toString(orientation[1]) + ", "
+                        + Float.toString(orientation[2]) + ","
+                        + Float.toString(mAccelerometerValues[0]) + ", "
+                        + Float.toString(mAccelerometerValues[1]) + ", "
+                        + Float.toString(mAccelerometerValues[2]) + "\n";
+            }
+            TextView timeTextView = (TextView) findViewById(R.id.text_time);
+            timeTextView.setText(currentTime);
             lineNumber++;
-            writeFile(values);
+            allValues.add(values);
         }
     }
 
