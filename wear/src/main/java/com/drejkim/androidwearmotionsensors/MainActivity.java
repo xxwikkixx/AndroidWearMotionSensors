@@ -79,7 +79,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         setContentView(R.layout.activity_main);
 
         directory = new File(Environment.getExternalStorageDirectory().getPath());
-        file = new File(directory, "XYZ.csv");
+        file = new File(directory, fileName);
         butRecord = (ToggleButton) this.findViewById(R.id.butRec);
         butRecord.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -113,7 +113,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             allValues = new ArrayList<>();
         }
         currentTime = time.format(System.currentTimeMillis());
-        Log.d(TAG, currentTime);
+        //Log.d(TAG, currentTime);
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             mAccelerometerValues = event.values;
         }
@@ -124,16 +124,14 @@ public class MainActivity extends Activity implements SensorEventListener {
             SensorManager.getOrientation(rotationMatrix, orientation);
         }
         if (mAccelerometerValues != null && rotationMatrix != null) {
-            if(lineNumber%10==0){
-                values = currentTime + ","
-                        + lineNumber + ","
-                        + Float.toString(orientation[0]) + ","
-                        + Float.toString(orientation[1]) + ", "
-                        + Float.toString(orientation[2]) + ","
-                        + Float.toString(mAccelerometerValues[0]) + ", "
-                        + Float.toString(mAccelerometerValues[1]) + ", "
-                        + Float.toString(mAccelerometerValues[2]) + "\n";
-            }
+            values = currentTime + ","
+                    + lineNumber + ","
+                    + Float.toString(orientation[0]) + ","
+                    + Float.toString(orientation[1]) + ", "
+                    + Float.toString(orientation[2]) + ","
+                    + Float.toString(mAccelerometerValues[0]) + ", "
+                    + Float.toString(mAccelerometerValues[1]) + ", "
+                    + Float.toString(mAccelerometerValues[2]) + "\n";
             TextView timeTextView = (TextView) findViewById(R.id.text_time);
             timeTextView.setText(currentTime);
             lineNumber++;
