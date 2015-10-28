@@ -107,7 +107,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                             writeFile(it.next());
                         num++;
                     }
-                    textView.setText("Done writing");
+                    textView.setText("Done writing, please close and restart app");
                 }
             }
         });
