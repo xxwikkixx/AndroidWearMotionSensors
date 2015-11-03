@@ -5,7 +5,7 @@ import numpy as np
 import sys
 import os
 
-PATH_NAME = os.getcwd()
+PATH_NAME = os.getcwd()+"/";
 file_name = sys.argv[1]
 
 #Sets turns to be degrees away from origin instead of degrees away from north
