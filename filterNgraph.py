@@ -71,8 +71,9 @@ def write_to_file(arrayOne, arrayTwo):
 		
 
 data = np.genfromtxt(PATH_NAME + file_name, 
-		      dtype=["|S13", int, float, float, float, float, float, float], delimiter=',', 
-		      names=['time', 'sec', 'azi', 'pitch', 'roll', 'accx', 'accy', 'accz'])
+	dtype=["|S13", int, float, float, float, float, float, float], delimiter=',', 
+	skip_footer=1,
+	names=['time', 'sec', 'azi', 'pitch', 'roll', 'accx', 'accy', 'accz'])
 
 x = data['sec']
 y = data['azi']
@@ -83,7 +84,7 @@ degree_y = set_zero(np.array(np.degrees(y)))
 new_degree_y = filter_noise(degree_y)
 s_v_y = np.array(savitzky_golay(new_degree_y, 3, 1))
 time = make_time_array(data['time'])
-np.savetxt(str(PATH_NAME + "_FILTERED_" + file_name), np.transpose([x, s_v_y]), fmt="%s")
+#np.savetxt(str(PATH_NAME + "_FILTERED_" + file_name), np.transpose([x, s_v_y]), fmt="%s")
 other_acc = np.array(np.sqrt(np.square(data['accx']) + np.square(data['accy']) + np.square(data['accz'])))
 
 plt.figure(1)
@@ -142,7 +143,7 @@ plt.locator_params(nbins=len(time))
 plt.ylabel('Degrees')
 plt.xticks(rotation=70)
 plt.xlabel('Time')
-plt.ylim(-400, 400)
+#plt.ylim(-400, 400)
 plt.show()
 
 plt.figure(6)
@@ -154,7 +155,7 @@ plt.locator_params(nbins=len(time))
 plt.ylabel('Degrees')
 plt.xticks(rotation=70)
 plt.xlabel('Time')
-plt.ylim(-400, 400)
+#plt.ylim(-400, 400)
 plt.show()
 
 plt.figure(7)
