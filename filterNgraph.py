@@ -76,6 +76,8 @@ data = np.genfromtxt(PATH_NAME + file_name,
 
 x = data['sec']
 y = data['azi']
+pit = data['pitch']
+roll = data['roll']
 acc_z = data['accz']
 degree_y = set_zero(np.array(np.degrees(y)))
 new_degree_y = filter_noise(degree_y)
@@ -130,8 +132,32 @@ plt.xticks(rotation=70)
 plt.xlabel('Time')
 plt.ylim(-400, 400)
 plt.show()
-'''
+
 plt.figure(5)
+plt.title('Raw Pitch')
+plt.plot(x, pit, '-')
+ax = plt.gca()
+ax.set_xticklabels(time)
+plt.locator_params(nbins=len(time))
+plt.ylabel('Degrees')
+plt.xticks(rotation=70)
+plt.xlabel('Time')
+plt.ylim(-400, 400)
+plt.show()
+
+plt.figure(6)
+plt.title('Raw Roll')
+plt.plot(x, roll, '-')
+ax = plt.gca()
+ax.set_xticklabels(time)
+plt.locator_params(nbins=len(time))
+plt.ylabel('Degrees')
+plt.xticks(rotation=70)
+plt.xlabel('Time')
+plt.ylim(-400, 400)
+plt.show()
+
+plt.figure(7)
 plt.title('Acceleration on X axis')
 plt.plot(x, data['accx'], '-')
 ax = plt.gca()
@@ -142,7 +168,7 @@ plt.xticks(rotation=70)
 plt.xlabel('Time')
 plt.show()
 
-plt.figure(6)
+plt.figure(8)
 plt.title('Acceleration on Y axis')
 plt.plot(x, data['accy'], '-')
 ax = plt.gca()
@@ -153,7 +179,7 @@ plt.xticks(rotation=70)
 plt.xlabel('Time')
 plt.show()
 
-plt.figure(7)
+plt.figure(9)
 plt.title('Acceleration on Z axis')
 plt.plot(x, data['accz'], '-')
 ax = plt.gca()
@@ -164,7 +190,7 @@ plt.xticks(rotation=70)
 plt.xlabel('Time')
 plt.show()
 
-plt.figure(8)
+plt.figure(10)
 plt.title('Acceleration on all axes')
 plt.plot(x, other_acc, '-')
 ax = plt.gca()
@@ -174,4 +200,4 @@ plt.ylabel(' ')
 plt.xticks(rotation=70)
 plt.xlabel('Time')
 plt.show()
-'''
+
