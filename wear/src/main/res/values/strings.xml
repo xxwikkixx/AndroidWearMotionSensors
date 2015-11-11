@@ -6,4 +6,6 @@
     <string name="init_values">Getting data...</string>
     <string name="start">Press to Start</string>
     <string name="stop">Stop Recording</string>
+    <string name="writing">Writing to File...</string>
+    <string name="done_writting">Done writing, please close and restart app</string>
 </resources>
