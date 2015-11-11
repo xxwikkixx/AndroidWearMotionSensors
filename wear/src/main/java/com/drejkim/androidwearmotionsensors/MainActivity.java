@@ -44,7 +44,11 @@ public class MainActivity extends Activity implements SensorEventListener {
     Sensor sensorGeoRotationVector = null;
     ArrayList<String> allValues;
 
-    private TextView mTextTitle;
+    private TextView timeTextView;
+    private TextView azimuthTextView;
+    private TextView pitchTextView;
+    private TextView rollTextView;
+
     private FileWriter input;
     private SensorManager mSensorManager;
     private int lineNumber = 0;
@@ -75,6 +79,13 @@ public class MainActivity extends Activity implements SensorEventListener {
         directory = new File(Environment.getExternalStorageDirectory().getPath());
         file = new File(directory, fileName);
         butRecord = (ToggleButton) this.findViewById(R.id.butRec);
+
+        timeTextView = (TextView) findViewById(R.id.text_time);
+        azimuthTextView = (TextView) findViewById(R.id.azimuth_values);
+        pitchTextView = (TextView) findViewById(R.id.pitch_values);
+        timeTextView = (TextView) findViewById(R.id.text_time);
+        rollTextView = (TextView) findViewById(R.id.roll_values);
+
         butRecord.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -132,8 +143,14 @@ public class MainActivity extends Activity implements SensorEventListener {
                     + Float.toString(mAccelerometerValues[0]) + ", "
                     + Float.toString(mAccelerometerValues[1]) + ", "
                     + Float.toString(mAccelerometerValues[2]) + "\n";
-            TextView timeTextView = (TextView) findViewById(R.id.text_time);
+
             timeTextView.setText(currentTime);
+
+            azimuthTextView.setText(String.format("%f", orientation[0]));
+            azimuthTextView.setText(String.format("%f", orientation[0]));
+            pitchTextView.setText(String.format("%f", orientation[1]));
+            rollTextView.setText(String.format("%f", orientation[2]));
+
             lineNumber++;
             allValues.add(values);
         }
