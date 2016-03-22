@@ -55,10 +55,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     float[] rotationMatrix = null;
     float[] mAccelerometerValues = null;
     float orientation[] = new float[3];
-    String csv[];
-
-    private long mShakeTime = 0;
-    private long mRotationTime = 0;
+    
     private File directory;
     private File file;
     private BufferedWriter bufferedWriter;
@@ -70,7 +67,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     private SimpleDateFormat date = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss", Locale.US);
     private final String fileName = date.format(calTime.getTime()) + ".csv";
 
-    int count = 0;
     ToggleButton butRecord;
 
     @Override
@@ -99,7 +95,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                     thread.start();
                     destroySensors();
                     TextView textView = (TextView) findViewById(R.id.text_values);
-                    textView.setText("Writing to file...");
+                    textView.setText(R.string.writing);
                     ListIterator<String> it = allValues.listIterator();
                     int num = 0;
                     while(it.hasNext()){
@@ -107,12 +103,25 @@ public class MainActivity extends Activity implements SensorEventListener {
                             writeFile(it.next());
                         num++;
                     }
-                    textView.setText("Done writing, please close and restart app");
+                    textView.setText(R.string.done_writing);
                 }
             }
         });
     }
 
+    /**
+     * Method called when the sensors change
+     * @param event
+     * Data is organized in the following way:
+     * Time: Time in which the data was collected
+     * Line Number: data point being collected. Used for sorting after the fact
+     * Azimuth: Degrees from north
+     * Pitch
+     * Roll
+     * Acceleration in the X direction
+     * Acceleration in the Y direction
+     * Acceleration in the Z direction
+     */
     @Override
     public void onSensorChanged(SensorEvent event) {
 
@@ -123,7 +132,6 @@ public class MainActivity extends Activity implements SensorEventListener {
             allValues = new ArrayList<>();
         }
         currentTime = time.format(System.currentTimeMillis());
-        //Log.d(TAG, currentTime);
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             mAccelerometerValues = event.values;
         }
@@ -157,8 +165,6 @@ public class MainActivity extends Activity implements SensorEventListener {
                 Log.d(TAG, e.toString());
             }
         }
-        //Commenting out because its easier to adb pull XYZ.csv
-        //File file = new File(directory, fileName);
         try {
             bufferedWriter.write(toWrite);
         }catch(IOException e){
@@ -170,14 +176,13 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
-    private void timer(){
-        try {
-            wait(50000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 
+    /**
+     * Method for preparing the sensors
+     * Sensor delay is set to SENSOR_DELAY_UI. This is optimal for the watch, considering collection
+     * happens on the main thread. Any faster causes the application to hang, and data is not recorded
+     * properly
+     */
     private void prepareSensors() {
         mSensorManager = (SensorManager)this.getSystemService(Context.SENSOR_SERVICE);
         sensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
