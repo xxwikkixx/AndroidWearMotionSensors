@@ -55,7 +55,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     float[] rotationMatrix = null;
     float[] mAccelerometerValues = null;
     float orientation[] = new float[3];
-    
+
     private File directory;
     private File file;
     private BufferedWriter bufferedWriter;
@@ -182,6 +182,8 @@ public class MainActivity extends Activity implements SensorEventListener {
      * Sensor delay is set to SENSOR_DELAY_UI. This is optimal for the watch, considering collection
      * happens on the main thread. Any faster causes the application to hang, and data is not recorded
      * properly
+     *
+     * SENSOR_DELAY_UI sets the sampling rate to 60000 microseconds (0.06 seconds)
      */
     private void prepareSensors() {
         mSensorManager = (SensorManager)this.getSystemService(Context.SENSOR_SERVICE);
@@ -193,6 +195,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         mSensorManager.registerListener(this, sensorGeoRotationVector, SensorManager.SENSOR_DELAY_UI);
         butRecord.setText(R.string.stop);
     }
+
     private void destroySensors(){
         if(mSensorManager!=null){
             mSensorManager.unregisterListener(this);
