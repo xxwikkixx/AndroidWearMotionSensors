@@ -83,16 +83,6 @@ public class MainActivity extends Activity implements SensorEventListener {
                 if (isChecked) {
                     prepareSensors();
                 } else {
-                    Thread thread = new Thread() {
-                        public void run() {
-                            try {
-                                wait(50000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    };
-                    thread.start();
                     destroySensors();
                     TextView textView = (TextView) findViewById(R.id.text_values);
                     textView.setText(R.string.writing);
